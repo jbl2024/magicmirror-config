@@ -70,6 +70,13 @@ directory. New releases are installed below:
 
 PM2 starts the atomic `~/.local/share/magicmirror/current` symlink.
 
+On the existing host, migrate the former `config.env` once without displaying
+its values:
+
+```bash
+./scripts/migrate-legacy-env
+```
+
 ## Routine operations
 
 Deploy the committed configuration:

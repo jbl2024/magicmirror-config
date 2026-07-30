@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Migrate the legacy MagicMirror config.env without printing its values."""
+
+from __future__ import annotations
+
+import os
+import re
+import sys
+import tempfile
+from pathlib import Path
+
+
+def read_env(path: Path) -> dict[str, str]:
+    values: dict[str, str] = {}
+    if not path.exists():
+        return values
+    for raw_line in path.read_text().splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        values[key.strip()] = value.strip()
+    return values
+
+
+def main() -> int:
+    home = Path.home()
+    legacy_env = Path(
+        os.environ.get(
+            "LEGACY_MAGICMIRROR_ENV",
+            home / "MagicMirror/config/config.env",
+        )
+    )
+    legacy_config = Path(
+        os.environ.get(
+            "LEGACY_MAGICMIRROR_CONFIG",
+            home / "MagicMirror/config/config.js",
+        )
+    )
+    output = Path(
+        os.environ.get(
+            "MAGICMIRROR_ENV_FILE",
+            home / ".config/magicmirror/config.env",
+        )
+    )
+
+    values = read_env(output)
+    old_values = read_env(legacy_env)
+    aliases = {
+        "SECRET_CALENDAR_1_URL": "CALENDAR_1_URL",
+        "SECRET_CALENDAR_2_URL": "CALENDAR_2_URL",
+        "SECRET_CALENDAR_3_URL": "CALENDAR_3_URL",
+        "SECRET_LINKY_PRM": "LINKY_PRM",
+        "SECRET_LINKY_TOKEN": "LINKY_TOKEN",
+        "SECRET_SNCF_API_KEY": "SNCF_API_KEY",
+    }
+    for new_name, old_name in aliases.items():
+        if not values.get(new_name) and old_values.get(old_name):
+            values[new_name] = old_values[old_name]
+
+    config_text = legacy_config.read_text()
+    coordinates = re.findall(
+        r"\b(?:lat|lon):\s*(-?[0-9]+(?:\.[0-9]+)?)",
+        config_text,
+    )
+    if len(coordinates) >= 4:
+        values.setdefault("MIRROR_WEATHER_LAT", coordinates[0])
+        values.setdefault("MIRROR_WEATHER_LON", coordinates[1])
+        values.setdefault("MIRROR_RAIN_LAT", coordinates[2])
+        values.setdefault("MIRROR_RAIN_LON", coordinates[3])
+
+    station = re.search(r"""stationId:\s*["']([^"']+)["']""", config_text)
+    if station:
+        values.setdefault("SNCF_STATION_ID", station.group(1))
+
+    expected = [
+        "MIRROR_WEATHER_LAT",
+        "MIRROR_WEATHER_LON",
+        "MIRROR_RAIN_LAT",
+        "MIRROR_RAIN_LON",
+        "SNCF_STATION_ID",
+        "SECRET_CALENDAR_1_URL",
+        "SECRET_CALENDAR_2_URL",
+        "SECRET_CALENDAR_3_URL",
+        "SECRET_LINKY_PRM",
+        "SECRET_LINKY_TOKEN",
+        "SECRET_SNCF_API_KEY",
+    ]
+    missing = [name for name in expected if not values.get(name)]
+    if missing:
+        print(f"error: missing values for {', '.join(missing)}", file=sys.stderr)
+        return 1
+
+    output.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    fd, temporary_name = tempfile.mkstemp(dir=output.parent, prefix=".config.env.")
+    try:
+        with os.fdopen(fd, "w") as temporary:
+            temporary.write("# Managed locally; never commit this file.\n")
+            for name in expected:
+                temporary.write(f"{name}={values[name]}\n")
+        os.chmod(temporary_name, 0o600)
+        os.replace(temporary_name, output)
+    finally:
+        if os.path.exists(temporary_name):
+            os.unlink(temporary_name)
+
+    print(f"Migrated secrets to {output}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
