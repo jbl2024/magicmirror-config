@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+[[ $# -eq 1 ]] || {
+  printf 'usage: %s VERSION\n' "$0" >&2
+  exit 2
+}
+
+version="${1#v}"
+[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+  printf 'invalid MagicMirror version: %s\n' "$1" >&2
+  exit 2
+}
+
+target="${MIRROR_TARGET:-jerome@mirror.local}"
+remote_repo="${MIRROR_CONFIG_REPO:-magicmirror-config}"
+
+[[ "$remote_repo" =~ ^[A-Za-z0-9._/-]+$ ]] || {
+  printf 'invalid remote repository path\n' >&2
+  exit 1
+}
+
+ssh "$target" "cd -- $remote_repo && git pull --ff-only && MM_VERSION=$version ./scripts/install-local"

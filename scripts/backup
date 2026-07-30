@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+destination="${1:-$HOME/backups/magicmirror}"
+env_file="${MAGICMIRROR_ENV_FILE:-$HOME/.config/magicmirror/config.env}"
+timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+archive="$destination/magicmirror-secrets-$timestamp.tar.gz.age"
+
+mkdir -p -- "$destination"
+umask 077
+
+[[ -r "$env_file" ]] || {
+  printf 'error: missing secrets file: %s\n' "$env_file" >&2
+  exit 1
+}
+
+command -v age >/dev/null || {
+  printf 'error: age is required for encrypted backups\n' >&2
+  exit 1
+}
+
+[[ -n "${AGE_RECIPIENT:-}" ]] || {
+  printf 'error: set AGE_RECIPIENT to your age public key\n' >&2
+  exit 1
+}
+
+env_dir="$(dirname -- "$env_file")"
+env_name="$(basename -- "$env_file")"
+tar -C "$env_dir" -czf - "$env_name" |
+  age --recipient "$AGE_RECIPIENT" --output "$archive"
+
+printf '%s\n' "$archive"

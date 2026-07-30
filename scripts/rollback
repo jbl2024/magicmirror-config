@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+install_root="${MAGICMIRROR_INSTALL_ROOT:-$HOME/.local/share/magicmirror}"
+current_link="$install_root/current"
+previous_link="$install_root/previous"
+
+[[ -L "$previous_link" ]] || {
+  printf 'error: no previous release is available\n' >&2
+  exit 1
+}
+
+rollback_target="$(readlink "$previous_link")"
+[[ -d "$rollback_target" ]] || {
+  printf 'error: previous release no longer exists: %s\n' "$rollback_target" >&2
+  exit 1
+}
+
+current_target="$(readlink "$current_link")"
+ln -sfn -- "$rollback_target" "$install_root/current.new"
+mv -Tf -- "$install_root/current.new" "$current_link"
+ln -sfn -- "$current_target" "$previous_link"
+
+pm2 restart MagicMirror
+pm2 save
+printf 'Rolled back to %s\n' "$rollback_target"

@@ -1,0 +1,8 @@
+.env
+data/config/config.env
+data/config/config.js
+data/config/custom.css.before-*
+data/config/*.old*
+data/modules/
+backups/
+*.tar.gz

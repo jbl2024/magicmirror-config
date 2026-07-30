@@ -1,0 +1,129 @@
+---
+- name: Bootstrap the MagicMirror host
+  hosts: mirrors
+  become: true
+  vars:
+    mirror_user: jerome
+    mirror_home: "/home/{{ mirror_user }}"
+    config_repo_url: "https://github.com/jbl2024/magicmirror-config.git"
+    config_repo_dir: "{{ mirror_home }}/magicmirror-config"
+    node_version: "24.18.1"
+    node_archive: "node-v{{ node_version }}-linux-arm64.tar.xz"
+    node_sha256: "7201e3a09dc825bac57867c81913e2b8f0ef87d04cb9082af4cda82f6ff3d88c"
+    node_install_dir: "/opt/node-v{{ node_version }}"
+
+  pre_tasks:
+    - name: Require the ARM64 architecture used by mirror.local
+      ansible.builtin.assert:
+        that: ansible_architecture == "aarch64"
+        fail_msg: "This playbook currently pins the official ARM64 Node archive."
+
+  tasks:
+    - name: Install operating-system dependencies
+      ansible.builtin.apt:
+        name:
+          - age
+          - build-essential
+          - ca-certificates
+          - git
+          - libasound2
+          - libgbm1
+          - libgtk-3-0
+          - libnss3
+          - libx11-xcb1
+          - libxss1
+          - xz-utils
+        state: present
+        update_cache: true
+
+    - name: Create the versioned Node installation directory
+      ansible.builtin.file:
+        path: "{{ node_install_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Download the pinned official Node release
+      ansible.builtin.get_url:
+        url: "https://nodejs.org/dist/v{{ node_version }}/{{ node_archive }}"
+        dest: "/var/cache/{{ node_archive }}"
+        checksum: "sha256:{{ node_sha256 }}"
+        mode: "0644"
+
+    - name: Install Node
+      ansible.builtin.unarchive:
+        src: "/var/cache/{{ node_archive }}"
+        dest: "{{ node_install_dir }}"
+        remote_src: true
+        extra_opts:
+          - --strip-components=1
+        creates: "{{ node_install_dir }}/bin/node"
+
+    - name: Link Node commands into /usr/local/bin
+      ansible.builtin.file:
+        src: "{{ node_install_dir }}/bin/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        state: link
+        force: true
+      loop:
+        - node
+        - npm
+        - npx
+        - corepack
+
+    - name: Install the pinned PM2 release
+      ansible.builtin.command:
+        cmd: /usr/local/bin/npm install --global pm2@6.0.8
+        creates: /usr/local/bin/pm2
+      environment:
+        NPM_CONFIG_PREFIX: /usr/local
+
+    - name: Create the private configuration directory
+      ansible.builtin.file:
+        path: "{{ mirror_home }}/.config/magicmirror"
+        state: directory
+        owner: "{{ mirror_user }}"
+        group: "{{ mirror_user }}"
+        mode: "0700"
+
+    - name: Clone the sanitized deployment repository
+      ansible.builtin.git:
+        repo: "{{ config_repo_url }}"
+        dest: "{{ config_repo_dir }}"
+        version: main
+        update: true
+      become_user: "{{ mirror_user }}"
+
+    - name: Install the PM2 systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/pm2-mirror.service
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=PM2 process manager for MagicMirror
+          After=network.target graphical.target
+
+          [Service]
+          Type=forking
+          User={{ mirror_user }}
+          Environment=PATH=/usr/local/bin:/usr/bin:/bin
+          Environment=PM2_HOME={{ mirror_home }}/.pm2
+          PIDFile={{ mirror_home }}/.pm2/pm2.pid
+          ExecStart=/usr/local/lib/node_modules/pm2/bin/pm2 resurrect
+          ExecReload=/usr/local/lib/node_modules/pm2/bin/pm2 reload all
+          ExecStop=/usr/local/lib/node_modules/pm2/bin/pm2 kill
+          Restart=on-failure
+
+          [Install]
+          WantedBy=graphical.target
+      notify: Reload systemd
+
+    - name: Enable the PM2 service
+      ansible.builtin.systemd:
+        name: pm2-mirror.service
+        enabled: true
+        daemon_reload: true
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true

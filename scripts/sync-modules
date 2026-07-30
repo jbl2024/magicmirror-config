@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+modules_root="$repo_root/data/modules"
+mkdir -p -- "$modules_root"
+
+while IFS='|' read -r name repository commit; do
+  [[ -z "$name" || "$name" == \#* ]] && continue
+  module_dir="$modules_root/$name"
+
+  if [[ -d "$module_dir/.git" ]]; then
+    [[ -z "$(git -C "$module_dir" status --porcelain)" ]] || {
+      printf 'error: %s has local changes\n' "$module_dir" >&2
+      exit 1
+    }
+    git -C "$module_dir" remote set-url origin "$repository"
+    git -C "$module_dir" fetch --quiet origin "$commit"
+    git -C "$module_dir" checkout --quiet --detach FETCH_HEAD
+  else
+    git init --quiet "$module_dir"
+    git -C "$module_dir" remote add origin "$repository"
+    git -C "$module_dir" fetch --quiet --depth 1 origin "$commit"
+    git -C "$module_dir" checkout --quiet --detach FETCH_HEAD
+  fi
+
+  if [[ -f "$module_dir/package-lock.json" ]]; then
+    npm --prefix "$module_dir" ci --omit=dev --ignore-scripts
+  elif [[ -f "$module_dir/package.json" ]]; then
+    npm --prefix "$module_dir" install --omit=dev --ignore-scripts
+  fi
+done < "$repo_root/modules.lock"

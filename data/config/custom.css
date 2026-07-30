@@ -1,0 +1,666 @@
+/*
+ * Glossy orbital theme
+ *
+ * MMM-SNCF is deliberately excluded: the module draws its own blue departure
+ * board instead of using the generic glass card.
+ */
+
+:root {
+  --color-text: #c8d3df;
+  --color-text-dimmed: #718092;
+  --color-text-bright: #f7fbff;
+  --color-background: #020509;
+
+  --font-primary: "Roboto Condensed", "Avenir Next Condensed", sans-serif;
+  --font-secondary: "Roboto", "Avenir Next", sans-serif;
+
+  --font-size: 20px;
+  --font-size-small: 0.75rem;
+  --font-size-medium: 1.6rem;
+
+  --gap-body-top: 20px;
+  --gap-body-right: 20px;
+  --gap-body-bottom: 20px;
+  --gap-body-left: 20px;
+  --gap-modules: 18px;
+
+  --glass-fill: rgba(23, 39, 53, 0.58);
+  --glass-fill-deep: rgba(5, 15, 24, 0.74);
+  --glass-stroke: rgba(213, 235, 248, 0.34);
+  --glass-highlight: rgba(242, 250, 255, 0.32);
+  --glow-cyan: #61e7f2;
+  --glow-blue: #74baff;
+  --warm: #ffc861;
+}
+
+html,
+body {
+  background: #000000;
+  color: var(--color-text);
+}
+
+html {
+  width: 100%;
+  min-height: 100%;
+  background-color: #000000;
+}
+
+body {
+  box-sizing: border-box;
+  min-height: calc(100% - var(--gap-body-top) - var(--gap-body-bottom));
+  background-color: #000000;
+  overflow: hidden;
+}
+
+body::before {
+  content: none;
+}
+
+body::after {
+  content: none;
+}
+
+/* Glass material — the SNCF module is intentionally not selected. */
+.module:not(.MMM-SmartWebDisplay):not(.MMM-SNCF) {
+  position: relative;
+  box-sizing: border-box;
+  padding: 18px 22px 20px;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 26px;
+  outline: 0;
+  background:
+    radial-gradient(620px 520px at 26% 30%, #1f2630 0%, #161d24 52%, #131a20 100%) padding-box,
+    radial-gradient(560px 120px at 0% 0%,
+      rgba(255, 255, 255, 0.52) 0%,
+      rgba(255, 255, 255, 0.20) 25%,
+      rgba(255, 255, 255, 0.04) 50%,
+      transparent 62%) border-box,
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.075) 6%,
+      rgba(255, 255, 255, 0.035) 30%,
+      rgba(255, 255, 255, 0.04) 80%,
+      rgba(255, 255, 255, 0.10) 100%) border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.module:not(.MMM-SmartWebDisplay):not(.MMM-SNCF)::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 25px;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.018) 28px,
+      rgba(255, 255, 255, 0.007) 60px,
+      transparent 96px),
+    radial-gradient(430px 260px at 16% -6%,
+      rgba(255, 255, 255, 0.062) 0%,
+      rgba(255, 255, 255, 0.024) 45%,
+      transparent 70%);
+  content: "";
+  pointer-events: none;
+}
+
+.module:not(.MMM-SmartWebDisplay):not(.MMM-SNCF)::after {
+  content: none;
+}
+
+.module:not(.MMM-SmartWebDisplay):not(.MMM-SNCF) > * {
+  position: relative;
+  z-index: 1;
+}
+
+.module:not(.MMM-SmartWebDisplay):not(.MMM-SNCF) > .module-header {
+  margin: 0 0 13px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid rgba(177, 209, 227, 0.14);
+  color: #c1ced9;
+  font-family: var(--font-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.dimmed {
+  color: var(--color-text-dimmed);
+}
+
+.normal {
+  color: var(--color-text);
+}
+
+.bright {
+  color: var(--color-text-bright);
+}
+
+/* Top news transmission */
+.newsfeed {
+  width: calc(100vw - var(--gap-body-left) - var(--gap-body-right));
+  margin: 0 auto 24px;
+  padding: 11px 22px 13px !important;
+  text-align: center;
+}
+
+.newsfeed .module-header {
+  display: none;
+}
+
+.newsfeed .newsfeed-title {
+  color: #e8f4fb;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  text-shadow: 0 0 18px rgba(116, 186, 255, 0.16);
+}
+
+.newsfeed .newsfeed-source,
+.newsfeed .newsfeed-date {
+  color: #6f8294;
+  font-size: 0.65em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Left information rail */
+.region.top.left {
+  width: min(560px, 29vw);
+}
+
+.clock {
+  padding: 22px 26px 20px !important;
+  text-align: left;
+}
+
+.clock .module-header {
+  display: none;
+}
+
+.clock .date {
+  color: #b9c7d4;
+  font-family: var(--font-secondary);
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+.clock .time {
+  margin-top: 5px;
+  font-family: var(--font-primary);
+  font-size: 82px;
+  font-weight: 200;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-shadow:
+    0 0 25px rgba(116, 186, 255, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.clock .clock-second-digital {
+  margin-left: 7px;
+  color: var(--glow-blue);
+  font-size: 0.42em;
+  font-weight: 300;
+  text-shadow: 0 0 16px rgba(116, 186, 255, 0.35);
+}
+
+.clock .module-content::after {
+  content: none;
+}
+
+.calendar {
+  padding-right: 22px !important;
+  padding-left: 22px !important;
+}
+
+.calendar table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.calendar .event-wrapper {
+  border-bottom: 1px solid rgba(151, 193, 218, 0.1);
+}
+
+.calendar .event-wrapper:last-child {
+  border-bottom: 0;
+}
+
+.calendar td {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  font-size: 24px;
+  line-height: 1.12;
+}
+
+.calendar .symbol {
+  width: 37px;
+  padding-right: 7px;
+}
+
+.calendar .symbol span {
+  font-size: 20px;
+}
+
+.calendar .title {
+  max-width: 315px;
+  overflow: hidden;
+  color: #edf5fa;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar .time {
+  color: #a7b5c2;
+  font-size: 21px;
+}
+
+.calendar .today .title,
+.calendar .today .symbol {
+  color: #ffffff;
+}
+
+.calendar .tomorrow .title,
+.calendar .tomorrow .symbol,
+.calendar .tomorrow .time {
+  color: var(--glow-blue);
+  text-shadow: 0 0 12px rgba(116, 186, 255, 0.2);
+}
+
+/* Atmospheric telemetry */
+.region.top.right {
+  box-sizing: border-box;
+  width: min(390px, 20vw);
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 26px;
+  background:
+    radial-gradient(560px 440px at 26% 18%, #1f2630 0%, #161d24 52%, #131a20 100%) padding-box,
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.34),
+      rgba(255, 255, 255, 0.04) 38%,
+      rgba(255, 255, 255, 0.1)) border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.region.top.right .module:not(.MMM-SmartWebDisplay) {
+  margin-bottom: 0;
+  padding: 18px 20px 20px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.region.top.right .module:not(.MMM-SmartWebDisplay)::before {
+  content: none;
+}
+
+.region.top.right .module:not(.MMM-SmartWebDisplay) + .module:not(.MMM-SmartWebDisplay) {
+  border-top: 1px solid rgba(177, 209, 227, 0.12);
+}
+
+/*
+ * Do not rely on MagicMirror's generated module id: it changes when the
+ * production module order differs. Center the compact group from its parent
+ * instead, using inline-flex for compatibility with older Electron builds.
+ */
+.region.top.right .weather .module-content {
+  text-align: center;
+}
+
+.region.top.right .weather .type-temp {
+  display: inline-flex !important;
+  width: auto !important;
+  align-items: center;
+  align-self: center;
+  justify-content: center !important;
+  margin: 8px auto 0 !important;
+  order: 1;
+  text-align: center;
+}
+
+.region.top.right .weather .type-temp .weathericon {
+  color: var(--warm) !important;
+  filter: drop-shadow(0 0 11px rgba(255, 200, 97, 0.38));
+  margin: 0 17px 0 0 !important;
+  padding: 0 !important;
+}
+
+.region.top.right .weather .type-temp .bright {
+  color: #f7fbff;
+  font-size: 61px;
+  font-weight: 300;
+  text-shadow: 0 0 22px rgba(255, 255, 255, 0.1);
+}
+
+.weather .feelslike {
+  color: #8f9ead;
+  font-size: 24px;
+}
+
+.region.top.right .weather .module-content > div {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: center;
+}
+
+.region.top.right .weather .feelslike {
+  display: block;
+  order: 2;
+  text-align: center;
+}
+
+.region.top.right .weather .module-content > div > .normal.medium:not(.feelslike) {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 18px;
+  order: 3;
+  padding-top: 15px;
+  border-top: 1px solid rgba(177, 209, 227, 0.12);
+  color: #b7c5d0;
+  font-size: 21px;
+  text-align: center;
+}
+
+.weather table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.weather table tr {
+  border-bottom: 1px solid rgba(151, 193, 218, 0.1);
+}
+
+.weather table tr:last-child {
+  border-bottom: 0;
+}
+
+.weather table td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 24px;
+}
+
+#module_6_weather > .module-header {
+  font-size: 0;
+}
+
+#module_6_weather > .module-header::before {
+  content: "Prévision à 7 jours";
+  font-size: 14px;
+}
+
+#module_6_weather .day {
+  text-align: left;
+}
+
+#module_6_weather .weather-icon {
+  text-align: center;
+}
+
+#module_6_weather .max-temp,
+#module_6_weather .min-temp {
+  text-align: right;
+}
+
+.weather .weather-icon {
+  color: #edf5fb;
+  filter: drop-shadow(0 0 7px rgba(220, 236, 247, 0.18));
+}
+
+/* Natural, semantic colors for weather pictograms. */
+.weather .wi-day-sunny,
+.weather .wi-hot {
+  color: #ffc95f;
+  filter: drop-shadow(0 0 9px rgba(255, 190, 70, 0.42));
+}
+
+.weather .wi-cloud,
+.weather .wi-cloudy,
+.weather [class*="-cloudy"],
+.weather [class*="-overcast"] {
+  color: #edf5fb;
+  filter: drop-shadow(0 0 7px rgba(220, 236, 247, 0.22));
+}
+
+/* Mixed day icons: warm sun above, cool white cloud below. */
+.weather .wi-day-sunny-overcast::before,
+.weather .wi-day-cloudy::before,
+.weather .wi-day-cloudy-high::before {
+  background: linear-gradient(180deg, #ffc95f 0%, #ffc95f 42%, #f3f8fc 59%, #d6e3ec 100%);
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 7px rgba(255, 201, 95, 0.2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.weather [class*="-rain"],
+.weather [class*="-showers"],
+.weather [class*="-sprinkle"],
+.weather .wi-rain,
+.weather .wi-showers,
+.weather .wi-raindrops,
+.weather .wi-raindrop {
+  color: #69c7ff;
+  filter: drop-shadow(0 0 8px rgba(70, 178, 242, 0.34));
+}
+
+/* Cloud on top, precipitation below. */
+.weather [class*="-rain"]::before,
+.weather [class*="-showers"]::before,
+.weather [class*="-sprinkle"]::before {
+  background: linear-gradient(180deg, #f0f6fa 0%, #dce8f0 46%, #70ccff 55%, #3d9fe4 100%);
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.weather [class*="-thunderstorm"],
+.weather [class*="-lightning"],
+.weather .wi-thunderstorm {
+  color: #ffd166;
+  filter: drop-shadow(0 0 9px rgba(255, 177, 66, 0.38));
+}
+
+.weather [class*="-thunderstorm"]::before,
+.weather [class*="-lightning"]::before {
+  background: linear-gradient(180deg, #edf5fa 0%, #d8e4ec 45%, #ffd166 56%, #ff9f43 100%);
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.weather [class*="-snow"],
+.weather [class*="-sleet"],
+.weather [class*="-hail"],
+.weather .wi-snow,
+.weather .wi-snowflake-cold {
+  color: #dff7ff;
+  filter: drop-shadow(0 0 9px rgba(166, 229, 255, 0.38));
+}
+
+.weather [class*="-snow"]::before,
+.weather [class*="-sleet"]::before,
+.weather [class*="-hail"]::before {
+  background: linear-gradient(180deg, #f5f9fc 0%, #e4eef4 47%, #b9edff 56%, #74c9ee 100%);
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.weather [class*="-fog"],
+.weather .wi-fog,
+.weather .wi-dust,
+.weather .wi-smog {
+  color: #aebbc5;
+  filter: drop-shadow(0 0 6px rgba(192, 207, 218, 0.18));
+}
+
+.weather .wi-night-clear,
+.weather .wi-moon-alt-new,
+.weather [class*="night-clear"] {
+  color: #c8ddff;
+  filter: drop-shadow(0 0 9px rgba(128, 175, 255, 0.32));
+}
+
+/*
+ * The current-condition glyph is drawn by ::before. MagicMirror 2.31 places
+ * it directly inside `.large`; newer releases wrap it in `.type-temp`.
+ * Target both templates after the generic weather rules so older Electron
+ * builds cannot repaint the glyph white.
+ */
+.region.top.right .weather .type-temp .weathericon,
+.region.top.right .weather .type-temp .weathericon::before,
+.region.top.right .weather .module-content .large > .weathericon,
+.region.top.right .weather .module-content .large > .weathericon::before {
+  background: none !important;
+  color: #ffc861 !important;
+  -webkit-text-fill-color: #ffc861 !important;
+}
+
+.region.top.right .weather .type-temp .weathericon,
+.region.top.right .weather .module-content .large > .weathericon {
+  filter: drop-shadow(0 0 11px rgba(255, 200, 97, 0.38));
+}
+
+.weather .max-temp {
+  color: #ff7c86 !important;
+}
+
+.weather .min-temp {
+  color: #78c4ff !important;
+}
+
+/* Rain forecast */
+.MMM-RainForecast-FR {
+  color: #dce9f1;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.MMM-RainForecast-FR .title {
+  margin-bottom: 8px;
+  color: #e8f3f8 !important;
+  font-size: 18px;
+  font-weight: 400;
+  text-align: center;
+  white-space: normal;
+}
+
+.MMM-RainForecast-FR .timeline {
+  margin-bottom: 4px;
+}
+
+.MMM-RainForecast-FR .timeline table {
+  width: 100%;
+  border-collapse: separate !important;
+  border-spacing: 2px 2px;
+}
+
+.MMM-RainForecast-FR .timeline tr {
+  height: 12px;
+  border: 0;
+}
+
+.MMM-RainForecast-FR .timeline td {
+  height: 100%;
+  padding: 0;
+  border-radius: 2px;
+  background: rgba(91, 121, 140, 0.14);
+}
+
+.MMM-RainForecast-FR .raining {
+  background: linear-gradient(180deg, #80eff8, #238ca5);
+  box-shadow: 0 0 7px rgba(97, 231, 242, 0.42);
+}
+
+.MMM-RainForecast-FR .hours td {
+  background: transparent;
+  text-align: center !important;
+}
+
+.MMM-RainForecast-FR .hours td span {
+  margin-left: 0;
+  color: #748696;
+  font-size: 11px;
+}
+
+/* Energy telemetry */
+.region.bottom.center {
+  width: min(760px, 46vw);
+}
+
+/*
+ * On the 1080p mirror, the tall calendar and the bottom-center Linky card
+ * overlap vertically. Keep Linky inside the free center lane so their
+ * horizontal bounds never intersect. Smaller development viewports retain
+ * the more generous sizing above.
+ */
+@media (min-width: 1800px) and (max-height: 1200px) {
+  /*
+   * Preserve the existing left anchors, then grow both center modules toward
+   * the weather rail until their right and left gutters are equal.
+   */
+  .region.top.center {
+    left: calc(50% - 320px);
+    width: calc(640px + min(560px, 29vw) - min(390px, 20vw));
+    transform: none;
+  }
+
+  .region.top.center .MMM-SNCF {
+    box-sizing: border-box;
+    width: 100% !important;
+  }
+
+  .region.bottom.center {
+    left: calc(50% - 360px);
+    width: calc(720px + min(560px, 29vw) - min(390px, 20vw));
+    transform: none;
+  }
+}
+
+.MMM-Linky {
+  padding: 14px 20px 12px !important;
+}
+
+#MMM-Linky {
+  max-width: none;
+}
+
+#MMM-Linky_Chart {
+  height: 240px !important;
+  filter:
+    drop-shadow(0 0 10px rgba(48, 205, 210, 0.06))
+    saturate(112%);
+}
+
+#MMM-Linky_Energie {
+  margin-top: 5px;
+  padding: 8px 12px;
+  border: 1px solid rgba(97, 231, 242, 0.12);
+  border-radius: 10px;
+  background: rgba(7, 20, 27, 0.54);
+  color: #71e0d2 !important;
+  font-size: 17px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+#MMM-Linky_Update,
+#MMM-Linky_Timer {
+  color: #627484;
+}

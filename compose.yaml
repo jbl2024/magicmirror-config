@@ -1,0 +1,27 @@
+services:
+  magicmirror:
+    image: karsten13/magicmirror:wolfi-server-v2.37.0
+    container_name: magicmirror
+    restart: unless-stopped
+
+    environment:
+      TZ: Europe/Paris
+      MM_SHOW_CURSOR: "true"
+      MIRROR_WEATHER_LAT: "${MIRROR_WEATHER_LAT:?missing MIRROR_WEATHER_LAT}"
+      MIRROR_WEATHER_LON: "${MIRROR_WEATHER_LON:?missing MIRROR_WEATHER_LON}"
+      MIRROR_RAIN_LAT: "${MIRROR_RAIN_LAT:?missing MIRROR_RAIN_LAT}"
+      MIRROR_RAIN_LON: "${MIRROR_RAIN_LON:?missing MIRROR_RAIN_LON}"
+      SNCF_STATION_ID: "${SNCF_STATION_ID:?missing SNCF_STATION_ID}"
+      SECRET_CALENDAR_1_URL: "${SECRET_CALENDAR_1_URL:?missing SECRET_CALENDAR_1_URL}"
+      SECRET_CALENDAR_2_URL: "${SECRET_CALENDAR_2_URL:?missing SECRET_CALENDAR_2_URL}"
+      SECRET_CALENDAR_3_URL: "${SECRET_CALENDAR_3_URL:?missing SECRET_CALENDAR_3_URL}"
+      SECRET_LINKY_PRM: "${SECRET_LINKY_PRM:?missing SECRET_LINKY_PRM}"
+      SECRET_LINKY_TOKEN: "${SECRET_LINKY_TOKEN:?missing SECRET_LINKY_TOKEN}"
+      SECRET_SNCF_API_KEY: "${SECRET_SNCF_API_KEY:?missing SECRET_SNCF_API_KEY}"
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    volumes:
+      - ./data/config:/opt/magic_mirror/config
+      - ./data/modules:/opt/magic_mirror/modules
