@@ -6,7 +6,8 @@ machine backups.
 
 ## Layout
 
-- `data/config/config.js.template`: shared MagicMirror configuration.
+- `data/config/config.js`: shared MagicMirror configuration with environment
+  placeholders.
 - `data/config/custom.css`: shared visual theme.
 - `modules.lock`: exact repository and commit for every third-party module.
 - `compose.yaml`: local server-only development environment.

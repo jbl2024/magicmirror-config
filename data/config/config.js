@@ -1,4 +1,4 @@
-/* Magic Mirror Config Sample
+/* MagicMirror configuration with environment placeholders.
  *
  * By Michael Teeuw http://michaelteeuw.nl
  * MIT Licensed.
