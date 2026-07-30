@@ -96,8 +96,7 @@ trap - ERR
 
 if command -v pm2 >/dev/null; then
   MAGICMIRROR_INSTALL_ROOT="$install_root" \
-    pm2 startOrReload "$repo_root/pm2/ecosystem.config.cjs" --update-env
-  pm2 save
+    "$repo_root/scripts/restart"
 else
   printf 'MagicMirror installed at %s\n' "$release_dir"
   printf 'PM2 is not installed; start it with: cd %q && npm start\n' "$current_link"

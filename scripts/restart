@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+install_root="${MAGICMIRROR_INSTALL_ROOT:-$HOME/.local/share/magicmirror}"
+current_link="$install_root/current"
+
+if [[ ! -L "$current_link" || ! -d "$current_link" ]]; then
+  printf 'error: no active MagicMirror release at %s\n' "$current_link" >&2
+  exit 1
+fi
+
+command -v pm2 >/dev/null || {
+  printf 'error: pm2 is required\n' >&2
+  exit 1
+}
+
+# startOrReload keeps immutable metadata (notably cwd) from a legacy PM2 entry.
+# Recreate this one process so it always follows the managed current symlink.
+if pm2 describe MagicMirror >/dev/null 2>&1; then
+  pm2 delete MagicMirror
+fi
+
+MAGICMIRROR_INSTALL_ROOT="$install_root" \
+  pm2 start "$repo_root/pm2/ecosystem.config.cjs" \
+    --only MagicMirror \
+    --update-env
+pm2 save
