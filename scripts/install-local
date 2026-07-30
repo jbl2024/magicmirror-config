@@ -74,11 +74,10 @@ while IFS='|' read -r name repository commit; do
     npm --prefix "$module_dir" install --omit=dev --ignore-scripts
   fi
 
-  # Some modules keep their runtime entry points in src/ and materialize them
-  # with their development installer after dependencies are present.
-  if [[ -f "$module_dir/src/$name.js" ]] &&
-    npm --prefix "$module_dir" pkg get scripts.dev | grep -Fq '"'; then
-    npm --prefix "$module_dir" run dev
+  # Some modules keep their runtime entry points in src/. Materialize the
+  # complete tree without relying on an interactive or system-wide installer.
+  if [[ -f "$module_dir/src/$name.js" ]]; then
+    cp -R -- "$module_dir/src/." "$module_dir/"
   fi
 done < "$repo_root/modules.lock"
 

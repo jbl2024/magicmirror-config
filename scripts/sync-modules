@@ -30,8 +30,7 @@ while IFS='|' read -r name repository commit; do
     npm --prefix "$module_dir" install --omit=dev --ignore-scripts
   fi
 
-  if [[ -f "$module_dir/src/$name.js" ]] &&
-    npm --prefix "$module_dir" pkg get scripts.dev | grep -Fq '"'; then
-    npm --prefix "$module_dir" run dev
+  if [[ -f "$module_dir/src/$name.js" ]]; then
+    cp -R -- "$module_dir/src/." "$module_dir/"
   fi
 done < "$repo_root/modules.lock"
