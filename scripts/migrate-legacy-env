@@ -47,9 +47,6 @@ def main() -> int:
     values = read_env(output)
     old_values = read_env(legacy_env)
     aliases = {
-        "SECRET_CALENDAR_1_URL": "CALENDAR_1_URL",
-        "SECRET_CALENDAR_2_URL": "CALENDAR_2_URL",
-        "SECRET_CALENDAR_3_URL": "CALENDAR_3_URL",
         "SECRET_LINKY_PRM": "LINKY_PRM",
         "SECRET_LINKY_TOKEN": "LINKY_TOKEN",
         "SECRET_SNCF_API_KEY": "SNCF_API_KEY",
@@ -57,6 +54,18 @@ def main() -> int:
     for new_name, old_name in aliases.items():
         if not values.get(new_name) and old_values.get(old_name):
             values[new_name] = old_values[old_name]
+
+    calendar_aliases = {
+        "CALENDAR_1_URL": "SECRET_CALENDAR_1_URL",
+        "CALENDAR_2_URL": "SECRET_CALENDAR_2_URL",
+        "CALENDAR_3_URL": "SECRET_CALENDAR_3_URL",
+    }
+    for new_name, previous_name in calendar_aliases.items():
+        if not values.get(new_name):
+            values[new_name] = (
+                values.get(previous_name)
+                or old_values.get(new_name)
+            )
 
     config_text = legacy_config.read_text()
     coordinates = re.findall(
@@ -79,9 +88,9 @@ def main() -> int:
         "MIRROR_RAIN_LAT",
         "MIRROR_RAIN_LON",
         "SNCF_STATION_ID",
-        "SECRET_CALENDAR_1_URL",
-        "SECRET_CALENDAR_2_URL",
-        "SECRET_CALENDAR_3_URL",
+        "CALENDAR_1_URL",
+        "CALENDAR_2_URL",
+        "CALENDAR_3_URL",
         "SECRET_LINKY_PRM",
         "SECRET_LINKY_TOKEN",
         "SECRET_SNCF_API_KEY",
