@@ -73,6 +73,13 @@ while IFS='|' read -r name repository commit; do
   elif [[ -f "$module_dir/package.json" ]]; then
     npm --prefix "$module_dir" install --omit=dev --ignore-scripts
   fi
+
+  # Some modules keep their runtime entry points in src/ and materialize them
+  # with their development installer after dependencies are present.
+  if [[ -f "$module_dir/src/$name.js" ]] &&
+    npm --prefix "$module_dir" pkg get scripts.dev | grep -Fq '"'; then
+    npm --prefix "$module_dir" run dev
+  fi
 done < "$repo_root/modules.lock"
 
 install -m 0600 "$repo_root/data/config/config.js" "$release_dir/config/config.js"

@@ -11,7 +11,7 @@ module.exports = {
       name: "MagicMirror",
       cwd: path.join(installRoot, "current"),
       script: process.env.MAGICMIRROR_NPM || "/usr/local/bin/npm",
-      args: "start",
+      args: "run start:x11",
       interpreter: "none",
       autorestart: true,
       max_restarts: 10,
