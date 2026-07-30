@@ -51,17 +51,17 @@ var config = {
         calendars: [
           {
             symbol: "calendar",
-            color: "#ffffff",
+            color: "#ffb86c",
             url: "${SECRET_CALENDAR_1_URL}"
           },
           {
             symbol: "calendar",
-            color: "#6495ED",
+            color: "#78a9ff",
             url: "${SECRET_CALENDAR_2_URL}"
           },
           {
             symbol: "calendar",
-            color: "#36db27",
+            color: "#62d98b",
             url: "${SECRET_CALENDAR_3_URL}"
           }
         ]

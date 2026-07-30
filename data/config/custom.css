@@ -251,26 +251,27 @@ body::after {
 .calendar .title {
   max-width: 315px;
   overflow: hidden;
-  color: #edf5fa;
+  color: inherit;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .calendar .time {
-  color: #a7b5c2;
+  color: inherit;
   font-size: 21px;
+  opacity: 0.72;
 }
 
 .calendar .today .title,
 .calendar .today .symbol {
-  color: #ffffff;
+  filter: brightness(1.2);
 }
 
 .calendar .tomorrow .title,
 .calendar .tomorrow .symbol,
 .calendar .tomorrow .time {
-  color: var(--glow-blue);
-  text-shadow: 0 0 12px rgba(116, 186, 255, 0.2);
+  filter: brightness(1.1);
+  text-shadow: 0 0 12px currentColor;
 }
 
 /* Atmospheric telemetry */
