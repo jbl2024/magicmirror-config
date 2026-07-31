@@ -434,18 +434,6 @@ body::after {
   filter: drop-shadow(0 0 7px rgba(220, 236, 247, 0.22));
 }
 
-/* Mixed day icons: warm sun above, cool white cloud below. */
-.weather .wi-day-sunny-overcast::before,
-.weather .wi-day-cloudy::before,
-.weather .wi-day-cloudy-high::before {
-  background: linear-gradient(180deg, #ffc95f 0%, #ffc95f 42%, #f3f8fc 59%, #d6e3ec 100%);
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 7px rgba(255, 201, 95, 0.2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 .weather [class*="-rain"],
 .weather [class*="-showers"],
 .weather [class*="-sprinkle"],
@@ -457,15 +445,48 @@ body::after {
   filter: drop-shadow(0 0 8px rgba(70, 178, 242, 0.34));
 }
 
-/* Cloud on top, precipitation below. */
-.weather [class*="-rain"]::before,
-.weather [class*="-showers"]::before,
-.weather [class*="-sprinkle"]::before {
-  background: linear-gradient(180deg, #f0f6fa 0%, #dce8f0 46%, #70ccff 55%, #3d9fe4 100%);
-  background-clip: text;
-  color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/*
+ * Weather Icons is a monochrome font, so mixed glyphs cannot reliably color
+ * their individual parts. Recompose them from the font's separate sun and
+ * cloud glyphs instead.
+ */
+.weather .wi-day-sunny-overcast,
+.weather .wi-day-cloudy,
+.weather .wi-day-cloudy-high {
+  position: relative;
+  display: inline-block;
+  width: 1.28em;
+  height: 1em;
+  background: none !important;
+  color: transparent !important;
+  vertical-align: -0.08em;
+}
+
+.weather .wi-day-sunny-overcast::before,
+.weather .wi-day-cloudy::before,
+.weather .wi-day-cloudy-high::before {
+  position: absolute;
+  top: -0.12em;
+  right: -0.02em;
+  background: none !important;
+  color: #ffc95f !important;
+  content: "\f00d" !important;
+  filter: drop-shadow(0 0 7px rgba(255, 190, 70, 0.38));
+  font-size: 0.8em;
+  -webkit-text-fill-color: #ffc95f !important;
+}
+
+.weather .wi-day-sunny-overcast::after,
+.weather .wi-day-cloudy::after,
+.weather .wi-day-cloudy-high::after {
+  position: absolute;
+  bottom: -0.04em;
+  left: 0;
+  color: #edf5fb;
+  content: "\f041";
+  filter: drop-shadow(0 0 6px rgba(220, 236, 247, 0.22));
+  font-family: "weathericons";
+  font-size: 0.82em;
 }
 
 .weather [class*="-thunderstorm"],
@@ -475,13 +496,59 @@ body::after {
   filter: drop-shadow(0 0 9px rgba(255, 177, 66, 0.38));
 }
 
-.weather [class*="-thunderstorm"]::before,
-.weather [class*="-lightning"]::before {
-  background: linear-gradient(180deg, #edf5fa 0%, #d8e4ec 45%, #ffd166 56%, #ff9f43 100%);
-  background-clip: text;
-  color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Day showers: yellow sun, white cloud, and three blue rain strokes. */
+.weather [class*="wi-day-"][class*="-rain"],
+.weather [class*="wi-day-"][class*="-showers"],
+.weather [class*="wi-day-"][class*="-sprinkle"],
+.weather .wi-day-thunderstorm,
+.weather .wi-day-storm-showers,
+.weather .wi-day-lightning {
+  position: relative;
+  display: inline-block;
+  width: 1.3em;
+  height: 1.12em;
+  background:
+    linear-gradient(115deg, transparent 34%, #69c7ff 36%, #3d9fe4 62%, transparent 64%)
+      0.24em 0.79em / 0.16em 0.32em no-repeat,
+    linear-gradient(115deg, transparent 34%, #69c7ff 36%, #3d9fe4 62%, transparent 64%)
+      0.57em 0.79em / 0.16em 0.32em no-repeat,
+    linear-gradient(115deg, transparent 34%, #69c7ff 36%, #3d9fe4 62%, transparent 64%)
+      0.9em 0.79em / 0.16em 0.32em no-repeat !important;
+  color: transparent !important;
+  filter: drop-shadow(0 0 7px rgba(70, 178, 242, 0.28));
+  vertical-align: -0.12em;
+}
+
+.weather [class*="wi-day-"][class*="-rain"]::before,
+.weather [class*="wi-day-"][class*="-showers"]::before,
+.weather [class*="wi-day-"][class*="-sprinkle"]::before,
+.weather .wi-day-thunderstorm::before,
+.weather .wi-day-storm-showers::before,
+.weather .wi-day-lightning::before {
+  position: absolute;
+  top: -0.12em;
+  right: -0.02em;
+  background: none !important;
+  color: #ffc95f !important;
+  content: "\f00d" !important;
+  font-size: 0.78em;
+  -webkit-text-fill-color: #ffc95f !important;
+}
+
+.weather [class*="wi-day-"][class*="-rain"]::after,
+.weather [class*="wi-day-"][class*="-showers"]::after,
+.weather [class*="wi-day-"][class*="-sprinkle"]::after,
+.weather .wi-day-thunderstorm::after,
+.weather .wi-day-storm-showers::after,
+.weather .wi-day-lightning::after {
+  position: absolute;
+  top: 0.27em;
+  left: 0;
+  color: #edf5fb;
+  content: "\f041";
+  filter: drop-shadow(0 0 6px rgba(220, 236, 247, 0.22));
+  font-family: "weathericons";
+  font-size: 0.8em;
 }
 
 .weather [class*="-snow"],
@@ -521,16 +588,13 @@ body::after {
 /*
  * The current-condition glyph is drawn by ::before. MagicMirror 2.31 places
  * it directly inside `.large`; newer releases wrap it in `.type-temp`.
- * Target both templates after the generic weather rules so older Electron
- * builds cannot repaint the glyph white.
+ * Target both templates after the generic weather rules. Keep the warm
+ * fallback on the element itself, but do not repaint ::before: that would
+ * flatten mixed sun/cloud/rain glyphs back to a single yellow color.
  */
 .region.top.right .weather .type-temp .weathericon,
-.region.top.right .weather .type-temp .weathericon::before,
-.region.top.right .weather .module-content .large > .weathericon,
-.region.top.right .weather .module-content .large > .weathericon::before {
-  background: none !important;
+.region.top.right .weather .module-content .large > .weathericon {
   color: #ffc861 !important;
-  -webkit-text-fill-color: #ffc861 !important;
 }
 
 .region.top.right .weather .type-temp .weathericon,
