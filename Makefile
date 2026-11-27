@@ -1,4 +1,4 @@
-.PHONY: help check dev deploy modules rollback
+.PHONY: help check dev dev-stop deploy modules rollback
 
 .DEFAULT_GOAL := help
 
@@ -9,6 +9,7 @@ help:
 	  '  make check     Valider la configuration Docker Compose' \
 	  '  make modules   Synchroniser les modules locaux' \
 	  '  make dev       Synchroniser les modules et lancer Docker en local' \
+	  '  make dev-stop  Arrêter Docker en local' \
 	  '  make deploy    Déployer sur mirror.local' \
 	  '  make rollback  Revenir à la release précédente sur mirror.local'
 
@@ -17,6 +18,9 @@ check:
 
 dev: modules
 	docker compose up -d
+
+dev-stop:
+	docker compose down
 
 modules:
 	./scripts/sync-modules
