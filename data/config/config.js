@@ -151,8 +151,6 @@ var config = {
         affichageInterval: 1000 * 15,
         annee_n_minus_1: 1,
         couleur: 3,
-        valuebar: 1,
-        valuebartextcolor: 0,
         header: 1,
         energie: 1,
         updateDate: 0,
