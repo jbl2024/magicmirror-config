@@ -3,7 +3,7 @@
 check:
 	docker compose config --quiet
 
-dev:
+dev: modules
 	docker compose up -d
 
 modules:
