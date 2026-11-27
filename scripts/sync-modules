@@ -27,7 +27,7 @@ while IFS='|' read -r name repository commit; do
   if [[ -f "$module_dir/package-lock.json" ]]; then
     npm --prefix "$module_dir" ci --omit=dev --ignore-scripts
   elif [[ -f "$module_dir/package.json" ]]; then
-    npm --prefix "$module_dir" install --omit=dev --ignore-scripts
+    npm --prefix "$module_dir" install --omit=dev --ignore-scripts --package-lock=false
   fi
 
   if [[ -f "$module_dir/src/$name.js" ]]; then
